@@ -12,7 +12,7 @@ def make_instruction(x, y):
 
 def main():
     while(True):
-        print "Press [W, A, S, or D]\n"
+        print("Press [W, A, S, or D]\n")
         
         rawKey = msvcrt.getch()
         
@@ -40,7 +40,7 @@ def main():
                 print float(tmpData)
 
     arduinoSerial.close()
-    print "Program terminated"
+    print("Program terminated")
 
 if __name__ == '__main__':
     main()
