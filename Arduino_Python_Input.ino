@@ -1,6 +1,10 @@
 #include "MeOrion.h"
 
-int msg = 0;
+struct MotorInstruction {
+  int xMotor;
+  int yMotor;
+};
+
 MeStepper stepper1(PORT_1);
 MeStepper stepper2(PORT_2);
 
@@ -13,44 +17,34 @@ void setup() {
 }
 
 void loop() {
-
+      struct MotorInstruction msg;
       if(Serial.available()){
           msg = getMsg();
-          switch(msg)
-          {
-            case 1:
-              stepper1.move(100);
-              break;
-            case 2:
-              stepper1.move(-100);
-              break;
-            case 3:
-              stepper2.move(-100);
-              break;
-            case 4:
-              stepper2.move(100);
-              break;
-            case 0:
-              stepper1.move(0);
-              stepper2.move(0);
-              break;
-          }
+          processMsg(msg);
       }
       stepper1.run();
       stepper2.run();
-
 }
 
-int getMsg(){
-  float inMsg = Serial.read();
-  int value1 = (int) inMsg - '0';
-  String value1Str = String(value1);
-
-  inMsg = Serial.read();
-  int value2 = (int) inMsg - '0';
-  String value2Str = String(value2);
-
-  String valueFinal = value1Str + value2Str;
-  return valueFinal.toInt();
+void processMsg(struct MotorInstruction mi) {
+  stepper1.move(mi.xMotor * 100);
+  stepper2.move(mi.yMotor * 100);
 }
 
+struct MotorInstruction getMsg(){
+  struct MotorInstruction mi;
+  int i;
+  char *buffer;
+  unsigned char msgSize = Serial.read();
+  buffer = (char *) malloc(sizeof(char) * msgSize);
+
+  for (i = 0; i < msgSize; i++){
+    buffer[i] = Serial.read(); 
+  }
+
+  mi.xMotor = (int) buffer[0];
+  mi.yMotor = (int) buffer[1];
+  
+  free(buffer);
+  return mi;
+}
