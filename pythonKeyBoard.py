@@ -37,7 +37,7 @@ def main():
             
         if(arduinoSerial.inWaiting() > 0):
             tmpData = arduinoSerial.readline()
-            print(float(tmpData))
+            print(tmpData)
 
     arduinoSerial.close()
     print("Program terminated")
