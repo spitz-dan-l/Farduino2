@@ -17,7 +17,7 @@ def main():
         rawKey = msvcrt.getch()
         
         key = rawKey.decode()
-        print "You pressed: " + key
+        print("You pressed: " + key)
 
         if(key == "A"):
             ins = make_instruction(-1, 0)
@@ -37,7 +37,7 @@ def main():
             
         if(arduinoSerial.inWaiting() > 0):
             tmpData = arduinoSerial.readline()
-                print float(tmpData)
+                print(float(tmpData))
 
     arduinoSerial.close()
     print("Program terminated")
