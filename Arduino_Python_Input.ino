@@ -45,6 +45,8 @@ struct MotorInstruction getMsg(){
   mi.xMotor = (int) buffer[0];
   mi.yMotor = (int) buffer[1];
   
+  Serial.printf("received %d %d\n", buffer[0], buffer[1])
+  
   free(buffer);
   return mi;
 }
