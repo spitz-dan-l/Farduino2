@@ -1,46 +1,80 @@
-import serial, time, msvcrt
+import serial, time, getch
 
-arduinoSerial = serial.Serial('com3', 9600, timeout=0.1)
-time.sleep(2)
+import threading
+
+arduinoSerial = serial.Serial('/dev/cu.wchusbserial1410', 9600, timeout=0.1)
 tmpData = 0.0
 
 import struct
 
 
-def make_instruction(x, y):
-    return struct.pack('Bbb', 2, x, y)
+def make_instruction(x, y, servo_1, servo_2, pump):
+    return struct.pack('bbbbb', x, y, servo_1, servo_2, pump)
 
 def main():
+    thread = threading.Thread(target=serial_output, args=())
+    thread.daemon = True
+    thread.start()
+
+    print("Press [W, A, S, or D]\n")
     while(True):
-        print "Press [W, A, S, or D]\n"
+        rawKey = getch.getch()
         
-        rawKey = msvcrt.getch()
-        
-        key = rawKey.decode()
-        print "You pressed: " + key
+        key = rawKey.upper()
+        print("You pressed: ", key)
 
         if(key == "A"):
-            ins = make_instruction(-1, 0)
-        elif(key == "D"):
-            ins = make_instruction(1, 0)
+            ins = make_instruction(0, 0, 1, 0, 0)
+        elif(key == "Q"):
+            ins = make_instruction(0, 0, 2, 0, 0)
         elif(key == "W"):
-            ins = make_instruction(0, 1)
+            ins = make_instruction(0, 0, 0, 1, 0)
         elif(key == "S"):
-            ins = make_instruction(0, -1)
-        else:
-            ins = make_instruction(0, 0)
+            ins = make_instruction(0, 0, 0, 2, 0)
+        elif(key == 'E'):
+            ins = make_instruction(0, 0, 0, 0, 1)
+        elif(key == 'D'):
+            ins = make_instruction(0, 0, 0, 0, 2)
 
         arduinoSerial.write(ins)
 
         if(key == "0"):
             break
+
+        time.sleep(0.1)
             
-        if(arduinoSerial.inWaiting() > 0):
-            tmpData = arduinoSerial.readline()
-                print float(tmpData)
 
     arduinoSerial.close()
-    print "Program terminated"
+    print("Program terminated")
+
+def test():
+    thread = threading.Thread(target=serial_output, args=())
+    thread.daemon = True
+    thread.start()
+
+    inss = [
+        (-1, 0),
+        (1, 0),
+        (0, 1),
+        (0, -1),
+        (0, 0)
+    ]
+
+    binss = [make_instruction(*i) for i in inss]
+
+    for i,b in zip(inss, binss):
+        print('writing instruction', i)
+        arduinoSerial.write(b)
+        time.sleep(0.4)
+        
+    while True: time.sleep(1)
+
+def serial_output():
+    while True:
+        if arduinoSerial.inWaiting() > 0:
+            print(arduinoSerial.readline())
+        time.sleep(0.01)
+
 
 if __name__ == '__main__':
     main()
