@@ -18,10 +18,19 @@ def main():
 
     print("Press [W, A, S, or D]\n")
     while(True):
+<<<<<<< HEAD
         rawKey = getch.getch()
         
         key = rawKey.upper()
         print("You pressed: ", key)
+=======
+        print("Press [W, A, S, or D]\n")
+        
+        rawKey = msvcrt.getch()
+        
+        key = rawKey.decode()
+        print("You pressed: " + key)
+>>>>>>> e2eb34fb3a91e49570ed4c199720c486ba821b40
 
         if(key == "A"):
             ins = make_instruction(0, 0, 1, 0, 0)
@@ -42,7 +51,6 @@ def main():
             break
 
         time.sleep(0.1)
-            
 
     arduinoSerial.close()
     print("Program terminated")
